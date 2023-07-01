@@ -36,7 +36,7 @@
     <textarea rows="10" class="content" bind:value={contents} />
 </div>
 
-<div class="text-center">
+<div class="main">
     maximum 100MB
     <input bind:this={files} type="file" />
 </div>

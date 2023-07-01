@@ -11,4 +11,4 @@ export const myData = writable({
 export const isLogin = writable(false)
 export const showOnlyMe = writable(false)
 // export const host = readable("localhost")
-export const host = readable("springsvelte.xyz")
+export const host = readable("localhost:8080")
