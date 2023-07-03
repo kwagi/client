@@ -1,6 +1,6 @@
 <script>
-    import { metatags } from "@roxi/routify";
-    metatags.title = "게시판";
+    import { metatags } from "@roxi/routify"
+    metatags.title = "게시판"
 </script>
 
 <div class="main">
