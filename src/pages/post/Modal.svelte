@@ -19,22 +19,24 @@
         axios
             .post(requestURL, data)
             .then(() => {
-                alert("삭제완료!")
                 isDeleteMyPost = false
                 showModal = false
+                alert("삭제완료!")
                 $redirect("/")
             })
             .catch((e) => {
                 if (e.response.data[0].message) {
-                    alert(e.response.data[0].message)
                     isDeleteMyPost = false
                     showModal = false
+                    alert(e.response.data[0].message)
+                    dialog.close()
                     return
                 }
                 if (e.response.data) {
-                    alert(e.response.data)
                     isDeleteMyPost = false
                     showModal = false
+                    alert(e.response.data)
+                    dialog.close()
                 }
             })
     }
@@ -50,22 +52,25 @@
                 },
             })
             .then(() => {
-                alert("삭제완료!")
                 isDeleteReply = false
                 showModal = false
+                alert("삭제완료!")
+                dialog.close()
                 location.reload()
             })
             .catch((e) => {
                 if (e.response.data[0].message) {
-                    alert(e.response.data[0].message)
                     isDeleteReply = false
                     showModal = false
+                    alert(e.response.data[0].message)
+                    dialog.close()
                     return
                 }
                 if (e.response.data) {
-                    alert(e.response.data)
                     isDeleteReply = false
                     showModal = false
+                    alert(e.response.data)
+                    dialog.close()
                 }
             })
     }

@@ -3,6 +3,7 @@
     import { myInfo, isLogin, host } from "../../stores"
     import axios from "axios"
     import Modal from "./Modal.svelte"
+    import Image from "./Image.svelte"
 
     let showModal = false
     let isDeleteMyPost = false
@@ -83,11 +84,7 @@
     bind:postId="{postId}"
     bind:replyId="{replyId}" />
 {#await posting}
-    <div class="main">
-        <img
-            src="https://c.tenor.com/On7kvXhzml4AAAAi/loading-gif.gif"
-            alt="Loading" />
-    </div>
+    <div class="main">가져오는중...</div>
 {:then { post, images, reply }}
     <ul class="list-group">
         <li class="list-group-item">제목: {post.title}</li>
@@ -99,7 +96,7 @@
     <div class="text-center p-5">
         {#each images as image}
             <div class="main">
-                <img src="{dataFormat}{image}" alt="" />
+                <Image src="{dataFormat}{image}" />
             </div>
         {/each}
     </div>
