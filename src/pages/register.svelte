@@ -19,8 +19,13 @@
                 $redirect("/login")
             })
             .catch((e) => {
-                alert(e.response.data)
-                alert(e.response.data.errors[0].defaultMessage)
+                if (e.response.data[0].message) {
+                    alert(e.response.data[0].message)
+                    return
+                }
+                if (e.response.data) {
+                    alert(e.response.data)
+                }
             })
     }
 </script>
@@ -32,21 +37,16 @@
         >이메일:<input
             bind:value="{email}"
             placeholder="example@domain.com"
-            type="email"
-        /></label
-    >
+            type="email" /></label>
     <label class="form-control-plaintext"
-        >비밀번호:<input bind:value="{password}" type="password" /></label
-    >
+        >비밀번호:<input bind:value="{password}" type="password" /></label>
     <label class="form-control-plaintext"
-        >이름:<input bind:value="{name}" type="text" /></label
-    >
+        >이름:<input bind:value="{name}" type="text" /></label>
 </div>
 
 <div class="main">
     <label
         ><button on:click="{doReg}" class="btn btn-outline-primary"
             >회원가입</button
-        ></label
-    >
+        ></label>
 </div>

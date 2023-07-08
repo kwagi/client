@@ -1,8 +1,12 @@
 <script>
-    import { myData } from "../stores";
-    import { url } from "@roxi/routify";
+    import { myInfo, isLogin } from "../stores"
+    import { redirect, url } from "@roxi/routify"
+    if ($isLogin === false) {
+        alert("잘못된 접근입니다.")
+        $redirect("/")
+    }
 
-    const { email, name, regDate } = $myData;
+    const { email, name, regDate } = $myInfo
 </script>
 
 <div class="main">
@@ -21,11 +25,11 @@
         </tr>
         <tr>
             <th>가입일</th>
-            <td>{regDate.replace("T", "::")}</td>
+            <td>{regDate}</td>
         </tr>
     </table>
 </div>
 
 <div class="main">
-    <a class="btn btn-danger" href={$url("/delete")}>회원탈퇴</a>
+    <a class="btn btn-danger" href="{$url('/delete')}">회원탈퇴</a>
 </div>

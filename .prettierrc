@@ -1,5 +1,7 @@
 {
     "tabWidth": 4,
     "semi": false,
-    "svelteStrictMode": true
+    "svelteStrictMode": true,
+    "svelteAllowShorthand": false,
+    "svelteBracketNewLine": false
 }
