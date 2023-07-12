@@ -1,7 +1,7 @@
 <script>
     import { metatags, url } from "@roxi/routify"
     import axios from "axios"
-    import { myInfo, isLogin, host } from "../stores"
+    import { isLogin, host } from "../stores"
 
     metatags.title = "게시판"
     let page = 0
@@ -10,10 +10,13 @@
     const formData = new FormData()
     formData.append("page", page)
     formData.append("size", size)
-    let content = []
-    let posts = axios
-        .post(requestURL, formData)
-        .then((res) => ({ content } = res.data))
+
+    let posts = axios.post(requestURL, formData).then((res) => {
+        console.log(res.data)
+        content = res.data.content
+        return content
+    })
+    let { content } = posts
 </script>
 
 <div class="main">
@@ -33,7 +36,7 @@
 <div class="main">
     {#await posts}
         <p>불러오는중...</p>
-    {:then _}
+    {:then content}
         <table class="type09">
             <thead class="type09">
                 <tr>

@@ -8,9 +8,13 @@
     let showModal = false
     let isDeleteMyPost = false
     let isDeleteReply = false
+    let isDeleteAnswer = false
     let { email } = $myInfo
     let postId = $params.postId
     let replyId = 0
+    let clickedId = 0
+    let answerId = 0
+    let answerContents = ""
 
     let requestURL = `http://${$host}/api/post/${postId}`
     const posting = axios.get(requestURL).then((res) => {
@@ -18,9 +22,10 @@
         post = res.data.post
         images = res.data.images
         reply = res.data.reply
-        return { post, images, reply }
+        answer = res.data.answer
+        return { post, images, reply, answer }
     })
-    let { post, images, reply } = posting
+    let { post, images, reply, answer } = posting
 
     const clickLikes = () => {
         let requestURL = `http://${$host}/api/post/click-likes/${postId}`
@@ -51,6 +56,7 @@
             replyContents = replyContents.substring(0, 500)
         }
         let requestURL = `http://${$host}/api/post/write-reply/${postId}`
+        let token = localStorage.getItem("token")
         let data = {
             writer: email,
             replyContents,
@@ -58,9 +64,34 @@
         axios
             .post(requestURL, data, {
                 headers: {
+                    Token: token,
                     "Content-Type": "application/json",
                 },
             })
+            .then(() => {
+                alert("작성완료!")
+                location.reload()
+            })
+            .catch((e) => {
+                if (e.response.data[0].message) {
+                    alert(e.response.data[0].message)
+                    return
+                }
+                if (e.response.data) {
+                    alert(e.response.data)
+                }
+            })
+    }
+    let toggleAnswer = false
+
+    function writeAnswer(replyId, answerContents) {
+        let requestURL = `http://${$host}/api/post/write-answer/${replyId}`
+        let data = {
+            writer: email,
+            answerContents,
+        }
+        axios
+            .post(requestURL, data)
             .then(() => {
                 alert("작성완료!")
                 location.reload()
@@ -81,11 +112,15 @@
     bind:showModal="{showModal}"
     bind:isDeleteMyPost="{isDeleteMyPost}"
     bind:isDeleteReply="{isDeleteReply}"
+    bind:isDeleteAnswer="{isDeleteAnswer}"
     bind:postId="{postId}"
-    bind:replyId="{replyId}" />
+    bind:replyId="{replyId}"
+    bind:answerId="{answerId}"
+    ; />
+
 {#await posting}
-    <div class="main">가져오는중...</div>
-{:then { post, images, reply }}
+    <div class="text-center" style="padding: 10em"><h1>가져오는중...</h1></div>
+{:then { post, images, reply, answer }}
     <ul class="list-group">
         <li class="list-group-item">제목: {post.title}</li>
         <li class="list-group-item">
@@ -118,6 +153,7 @@
             {/if}
         {/if}
     </div>
+
     <table class="type09 text-dark">
         <thead>
             <tr>
@@ -131,36 +167,75 @@
         </thead>
 
         <tbody>
-            {#each reply as { writer, replyDate, replyContents, postReplyStatus, replyId: myReplyId }}
-                {#if postReplyStatus === "ALL"}
-                    <tr>
-                        {#if writer === email}
-                            <td class="text-break">나</td>
-                        {:else}
-                            <td class="text-break">{writer}</td>
+            {#each reply as { replyId: curReplyId, writer, replyContents, replyDate }}
+                <tr>
+                    <td class="text-break"
+                        ><button
+                            class="btn btn-outline-primary"
+                            on:click="{() => {
+                                toggleAnswer = !toggleAnswer
+                                clickedId = curReplyId
+                            }}">{writer}</button
+                        ></td>
+                    <td class="text-break">{replyContents}</td>
+                    <td>{replyDate}</td>
+                    <td
+                        ><button
+                            on:click="{() => {
+                                showModal = true
+                                isDeleteReply = true
+                                replyId = curReplyId
+                            }}"
+                            class="btn btn-outline-danger">삭제</button
+                        ></td>
+                </tr>
+
+                <tr>
+                    {#if toggleAnswer === true && clickedId === curReplyId}
+                        <input
+                            type="text"
+                            placeholder="답글"
+                            bind:value="{answerContents}" />
+                        <button
+                            class="btn btn-outline-dark"
+                            on:click="{() =>
+                                writeAnswer(clickedId, answerContents)}"
+                            >등록</button>
+                    {/if}
+                </tr>
+
+                {#each answer as answers}
+                    {#each answers as { answerId: curAnswerId, writer, answerContents, answerDate, reply }}
+                        {#if curReplyId === reply.replyId}
+                            <tr>
+                                <td class="text-break">↳{writer}</td>
+                                <td class="text-break">{answerContents}</td>
+                                <td>{answerDate}</td>
+                                <td
+                                    ><button
+                                        on:click="{() => {
+                                            showModal = true
+                                            isDeleteAnswer = true
+                                            answerId = curAnswerId
+                                        }}"
+                                        class="btn btn-outline-danger"
+                                        >삭제</button
+                                    ></td>
+                            </tr>
                         {/if}
-                        <td class="text-break">{replyContents}</td>
-                        <td>{replyDate}</td>
-                        <td
-                            ><button
-                                on:click="{() => {
-                                    showModal = true
-                                    isDeleteReply = true
-                                    replyId = myReplyId
-                                }}"
-                                class="btn btn-outline-danger">삭제</button
-                            ></td>
-                    </tr>
-                {:else}
-                    <td>삭제된 댓글입니다.</td>
-                {/if}
+                    {/each}
+                {/each}
             {/each}
         </tbody>
     </table>
 
     {#if $isLogin === true}
-        <div class="text-center">
-            <textarea class="col-6" bind:value="{replyContents}"></textarea>
+        <div class="text-center" style="padding: 5em;">
+            <textarea
+                placeholder="댓글"
+                class="col-10"
+                style="width: 100%;"
+                bind:value="{replyContents}"></textarea>
             <button on:click="{writeReply}" class="btn btn-outline-primary"
                 >작성</button>
         </div>

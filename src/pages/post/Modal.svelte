@@ -6,8 +6,11 @@
     export let showModal // boolean
     export let isDeleteMyPost // boolean
     export let isDeleteReply // boolean
+    export let isDeleteAnswer // boolean
+
     export let postId = 0
     export let replyId = 0
+    export let answerId = 0
     let password = ""
 
     const deleteMyPost = () => {
@@ -74,6 +77,41 @@
                 }
             })
     }
+
+    function deleteAnswer(answerId) {
+        let requestURL = `http://${$host}/api/post/delete-answer/${answerId}`
+        let data = {
+            password,
+        }
+        axios
+            .post(requestURL, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(() => {
+                isDeleteAnswer = false
+                showModal = false
+                alert("삭제완료!")
+                dialog.close()
+                location.reload()
+            })
+            .catch((e) => {
+                if (e.response.data[0].message) {
+                    isDeleteAnswer = false
+                    showModal = false
+                    alert(e.response.data[0].message)
+                    dialog.close()
+                    return
+                }
+                if (e.response.data) {
+                    isDeleteAnswer = false
+                    showModal = false
+                    alert(e.response.data)
+                    dialog.close()
+                }
+            })
+    }
     let dialog // HTMLDialogElement
 
     $: if (dialog && showModal) dialog.showModal()
@@ -86,6 +124,7 @@
         showModal = false
         isDeleteMyPost = false
         isDeleteReply = false
+        isDeleteAnswer = false
     }}"
     on:click|self="{() => dialog.close()}">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -100,6 +139,10 @@
                 <button
                     class="btn btn-outline-danger"
                     on:click="{() => deleteReply(replyId)}">댓글삭제</button>
+            {:else if isDeleteAnswer === true}
+                <button
+                    class="btn btn-outline-danger"
+                    on:click="{() => deleteAnswer(answerId)}">답글삭제</button>
             {/if}
         </div>
     </div>
@@ -107,7 +150,7 @@
 
 <style>
     dialog {
-        max-width: 32em;
+        max-width: 50em;
         border-radius: 0.2em;
         border: none;
         padding: 0;
