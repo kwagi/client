@@ -7,11 +7,11 @@
     let page = 0
     const size = 5
     let requestURL = `http://${$host}/api/post/`
-    const formData = new FormData()
-    formData.append("page", page)
-    formData.append("size", size)
+    const fd = new FormData()
+    fd.append("page", page)
+    fd.append("size", size)
 
-    let posts = axios.post(requestURL, formData).then((res) => {
+    let posts = axios.post(requestURL, fd).then((res) => {
         console.log(res.data)
         content = res.data.content
         return content
