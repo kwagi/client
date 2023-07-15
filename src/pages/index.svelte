@@ -10,7 +10,7 @@
     let content
     let totalPages
 
-    $: posts = axios.post(requestURL).then((res) => {
+    $: posts = axios.get(requestURL).then((res) => {
         content = res.data.content
         totalPages = res.data.totalPages
     })
