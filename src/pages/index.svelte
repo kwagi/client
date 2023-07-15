@@ -4,19 +4,20 @@
     import { isLogin, host } from "../stores"
 
     metatags.title = "게시판"
-    let page = 0
     const size = 5
-    let requestURL = `http://${$host}/api/post/`
-    const fd = new FormData()
-    fd.append("page", page)
-    fd.append("size", size)
+    $: page = 0
+    $: requestURL = `http://${$host}/api/post?page=${page}&size=${size}`
+    let content
+    let totalPages
 
-    let posts = axios.post(requestURL, fd).then((res) => {
-        console.log(res.data)
+    $: posts = axios.post(requestURL).then((res) => {
         content = res.data.content
-        return content
+        totalPages = res.data.totalPages
     })
-    let { content } = posts
+    $: if (page < 0) {
+        alert("첫페이지입니다.")
+        page = 0
+    }
 </script>
 
 <div class="main">
@@ -36,7 +37,7 @@
 <div class="main">
     {#await posts}
         <p>불러오는중...</p>
-    {:then content}
+    {:then}
         <table class="type09">
             <thead class="type09">
                 <tr>
@@ -65,4 +66,18 @@
             </tbody>
         </table>
     {/await}
+</div>
+<div class="main">
+    <button class="btn btn-outline-dark" on:click="{() => (page -= 1)}"
+        >prev</button>
+    <button
+        class="btn btn-outline-dark"
+        on:click="{() => {
+            if (page >= totalPages - 1) {
+                alert('마지막 페이지입니다.')
+                page = totalPages - 1
+            } else {
+                page += 1
+            }
+        }}">next</button>
 </div>
